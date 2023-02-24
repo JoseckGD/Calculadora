@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.mozilla.javascript.Scriptable;
 public class MainActivity extends AppCompatActivity {
 
     private TextView tv_resultado,tv_operacion;
@@ -141,5 +142,155 @@ public class MainActivity extends AppCompatActivity {
                 tipoPar=true;
             }
         });
+
+        btn_C.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tv_operacion.setText("");
+                tv_resultado.setText("0");
+                decimal = false;
+                tipoPar=false;
+                bandera=true;
+            }
+        });
+
+        btn_punto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!decimal){
+                    data = tv_operacion.getText().toString();
+                    tv_operacion.setText(data + ".");
+                }
+                decimal = true;
+
+            }
+        });
+
+        btn_suma.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                data = tv_operacion.getText().toString();
+                tv_operacion.setText(data + "+");
+                decimal = false;
+                tipoPar=false;
+            }
+        });
+
+        btn_resta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                data = tv_operacion.getText().toString();
+                tv_operacion.setText(data + "-");
+                decimal = false;
+                tipoPar=false;
+            }
+        });
+
+        btn_modulo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                data = tv_operacion.getText().toString();
+                tv_operacion.setText(data + "%");
+                decimal = false;
+                tipoPar=false;
+            }
+        });
+
+        btn_mult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                data = tv_operacion.getText().toString();
+                tv_operacion.setText(data + "*");
+                decimal = false;
+                tipoPar=false;
+            }
+        });
+
+        btn_div.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                data = tv_operacion.getText().toString();
+                tv_operacion.setText(data + "/");
+                decimal = false;
+            }
+        });
+
+        btn_borrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String text = tv_operacion.getText().toString();
+                if (text.length() > 1) {
+                    text = text.substring(0, text.length() - 1);
+                    tv_operacion.setText(text);
+                    if (text.charAt(text.length() - 1) == '.') {
+                        decimal = true;
+                    } else {
+                        decimal = false;
+                    }
+                } else {
+                    tv_operacion.setText("");
+                    decimal = false;
+                    tipoPar=false;
+                    bandera=true;
+                }
+            }
+        });
+
+        btn_parentesis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(tipoPar==true) {
+                    if (bandera == true) {
+                        data = tv_operacion.getText().toString();
+                        tv_operacion.setText(data + "*(");
+                        bandera = false;
+                    } else {
+                        data = tv_operacion.getText().toString();
+                        tv_operacion.setText(data + ")");
+                        bandera = true;
+                    }
+                }else {
+                    if (bandera == true) {
+                        data = tv_operacion.getText().toString();
+                        tv_operacion.setText(data + "(");
+                        bandera = false;
+                    } else {
+                        data = tv_operacion.getText().toString();
+                        tv_operacion.setText(data + ")");
+                        bandera = true;
+                    }
+                }
+                decimal = false;
+            }
+        });
+
+        btn_igual.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    data = tv_operacion.getText().toString();
+                    //Toast.makeText(MainActivity.this,""+data,Toast.LENGTH_SHORT).show();
+                    // Comprobar datos
+                    // //Log.e("@@@@@","onClick: "+data);
+                    data = data.replaceAll("×", "*");
+                    data = data.replaceAll("%", "/100");
+                    data = data.replaceAll("÷", "/");
+
+                    org.mozilla.javascript.Context rhino = org.mozilla.javascript.Context.enter();
+                    rhino.setOptimizationLevel(-1);
+
+                    String resultadoFinal = "";
+
+                    Scriptable scriptable = rhino.initStandardObjects();
+                    resultadoFinal = rhino.evaluateString(scriptable, data, "Javascript", 1, null).toString();
+
+                    tv_resultado.setText(resultadoFinal);
+                    decimal = false;
+                }catch (Exception e){
+                    tv_resultado.setText("Formato Invalido");
+                }
+            }
+        });
+
     }
 }
